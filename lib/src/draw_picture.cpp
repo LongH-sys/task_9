@@ -5,7 +5,7 @@
 #include <opencv2/imgproc.hpp>
 
 void draw_trajectory(
-    cv::Mat& canvas, 
+    cv::Mat& frame, 
     const cv::Vec3d& measured, 
     const cv::Vec3d& predicted, 
     const cv::Vec3d& updated, 
@@ -16,7 +16,7 @@ void draw_trajectory(
     std::vector<cv::Point>& updatedHistory
 )
 {
-    if (canvas.empty())
+    if (frame.empty())
     {
         return;
     }
@@ -42,7 +42,8 @@ void draw_trajectory(
         cvRound(points2D[0].y)
     );
     predictedHistory.emplace_back(
-        cvRound(points2D[1].x),
+        cvRound(points2D[1].x)
+,
         cvRound(points2D[1].y)
     );
     updatedHistory.emplace_back(
@@ -50,56 +51,54 @@ void draw_trajectory(
         cvRound(points2D[2].y)
     );
 
-    while (measuredHistory.size() > 120)
+    while (measuredHistory.size() > 30)
     {
         measuredHistory.erase(measuredHistory.begin());
         predictedHistory.erase(predictedHistory.begin());
         updatedHistory.erase(updatedHistory.begin());
     }
 
-    canvas.setTo(cv::Scalar(255, 255, 255));
-
     for (int i = 1; i < static_cast<int>(measuredHistory.size()); i++)
     {
         cv::line(
-            canvas,
+            frame,
             measuredHistory[i - 1],
             measuredHistory[i],
             cv::Scalar(255, 0, 0),
-            2
+            3
         );
         cv::line(
-            canvas,
+            frame,
             predictedHistory[i - 1],
             predictedHistory[i],
             cv::Scalar(0, 255, 0),
-            2
+            3
         ); 
         cv::line(
-            canvas,
+            frame,
             updatedHistory[i - 1],
             updatedHistory[i],
             cv::Scalar(0, 0, 255),
-            2
+            3
         );
     }
     
     cv::circle(
-            canvas,
+            frame,
             measuredHistory.back(),
             3,
             cv::Scalar(255, 0, 0),
             -1
         );
     cv::circle(
-            canvas,
+            frame,
             predictedHistory.back(),
             3,
             cv::Scalar(0, 255, 0),
             -1
         );
     cv::circle(
-            canvas,
+            frame,
             updatedHistory.back(),
             3,
             cv::Scalar(0, 0, 255),

@@ -5,7 +5,7 @@
 #include <vector>
 
 void draw_trajectory(
-    cv::Mat& canvas, 
+    cv::Mat& frame, 
     const cv::Vec3d& measured, 
     const cv::Vec3d& predicted, 
     const cv::Vec3d& updated, 

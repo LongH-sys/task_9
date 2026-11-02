@@ -20,17 +20,17 @@
 
 #include <iostream>
 
-double fx = 1811.899787;
-double fy = 1810.996967;
-double cx = 743.1573263;
-double cy = 575.0848947;
+double fx = 4458.8549687633;
+double fy = 4457.0808035083;
+double cx = 1989.8487562489;
+double cy = 1515.7365238851;
 cv::Mat cameraMatrix = (cv::Mat_<double>(3,3) <<
     fx, 0, cx,
     0, fy, cy,
     0,  0,  1
 );
-double k1 = -0.087493626;
-double k2 = 0.2084118559;
+double k1 = -0.0803149495;
+double k2 = 0.3602814150;
 cv::Mat distCoeffs = (cv::Mat_<double>(1,5) <<
     k1, k2, 0, 0, 0        
 );
@@ -74,8 +74,6 @@ int main()
         return -1;
     }
     cv::Mat frame;
-    cv::Mat canvas;
-    
     std::unique_ptr<KalmanFilter> kalman;
     
     using Clock = std::chrono::steady_clock;
@@ -86,8 +84,6 @@ int main()
     std::vector<cv::Point> updatedHistory;
     
     cv::namedWindow("Task_9", cv::WINDOW_NORMAL);
-    cv::namedWindow("Trajectories", cv::WINDOW_NORMAL);
-
     std::cout << "连续采集中,请按q停止采集" << std::endl;
 
     while(true)
@@ -95,17 +91,6 @@ int main()
         cv::Vec3d tvec;
         if (camera.get_frame(frame) && !frame.empty())
         {    
-            if (canvas.empty() || canvas.size() != frame.size())
-            {
-                canvas = cv::Mat(
-                    frame.size(),
-                    CV_8UC3,
-                    cv::Scalar(255, 255, 255)
-                );
-                measuredHistory.clear();
-                predictedHistory.clear();
-                updatedHistory.clear();
-            }
             auto currentTime = Clock::now();
             bool hasMeasurement = pnp_solver(frame, tvec, vino);
             if (!kalman)
@@ -127,7 +112,7 @@ int main()
                     kalman->update(tvec);
                     cv::Vec3d updated = kalman->getPosition();
                     draw_trajectory(
-                        canvas,
+                        frame,
                         tvec, 
                         predicted, 
                         updated, 
@@ -138,8 +123,37 @@ int main()
                         updatedHistory
                     );
                 }
-            } 
-            cv::imshow("Trajectories", canvas);
+            }
+            cv::putText(
+                frame, 
+                "measure", 
+                cv::Point(50, 100), 
+                cv::FONT_HERSHEY_SIMPLEX, 
+                3, 
+                cv::Scalar(255, 0, 0), 
+                2,
+                cv::LINE_AA
+            );
+            cv::putText(
+                frame, 
+                "predict", 
+                cv::Point(50, 200), 
+                cv::FONT_HERSHEY_SIMPLEX, 
+                3, 
+                cv::Scalar(0, 255, 0), 
+                2,
+                cv::LINE_AA
+            );
+            cv::putText(
+                frame, 
+                "update", 
+                cv::Point(50, 300), 
+                cv::FONT_HERSHEY_SIMPLEX, 
+                3, 
+                cv::Scalar(0, 0, 255), 
+                2,
+                cv::LINE_AA
+            ); 
             cv::imshow("Task_9", frame);
         }
         int key = cv::waitKey(10);

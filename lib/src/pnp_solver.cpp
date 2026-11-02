@@ -41,17 +41,17 @@ bool pnp_solver(
         {width / 2.0f, -height / 2.0f, 0.0f},
         {width / 2.0f, height / 2.0f, 0.0f}
     };                    
-    double fx = 1811.899787;
-    double fy = 1810.996967;
-    double cx = 743.1573263;
-    double cy = 575.0848947;
+    double fx = 4458.8549687633;
+    double fy = 4457.0808035083;
+    double cx = 1989.8487562489;
+    double cy = 1515.7365238851;
     cv::Mat cameraMatrix = (cv::Mat_<double>(3,3) <<
         fx, 0, cx,
         0, fy, cy,
         0,  0,  1
     );
-    double k1 = -0.087493626;
-    double k2 = 0.2084118559;
+    double k1 = -0.0803149495;
+    double k2 = 0.3602814150;
     cv::Mat distCoeffs = (cv::Mat_<double>(1,5) <<
         k1, k2, 0, 0, 0        
     );
