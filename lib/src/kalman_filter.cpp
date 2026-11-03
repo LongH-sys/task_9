@@ -17,6 +17,8 @@ void KalmanFilter::init(const cv::Vec3d& tvec)
     Z << tvec[0], tvec[1], tvec[2];
     A.setIdentity();
     P.setIdentity();
+    P.diagonal() << 0.0009, 0.0009, 0.01, 
+                    1.0,    1.0,    1.0;
     R.setZero();
     R.diagonal() << 0.0009, 0.0009, 0.01;
     Q.setZero();

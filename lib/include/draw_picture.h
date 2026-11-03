@@ -13,5 +13,6 @@ void draw_trajectory(
     const cv::Mat& distCoeffs, 
     std::vector<cv::Point>& measuredHistory, 
     std::vector<cv::Point>& predictedHistory, 
-    std::vector<cv::Point>& updatedHistory
+    std::vector<cv::Point>& updatedHistory,
+    bool hasMeasurement
 );

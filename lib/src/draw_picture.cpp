@@ -13,7 +13,8 @@ void draw_trajectory(
     const cv::Mat& distCoeffs, 
     std::vector<cv::Point>& measuredHistory, 
     std::vector<cv::Point>& predictedHistory, 
-    std::vector<cv::Point>& updatedHistory
+    std::vector<cv::Point>& updatedHistory,
+    bool hasMeasurement
 )
 {
     if (frame.empty())
@@ -36,26 +37,32 @@ void draw_trajectory(
         distCoeffs,
         points2D
     );
+    if (hasMeasurement)
+    {
+        measuredHistory.emplace_back(
+            cvRound(points2D[0].x),
+            cvRound(points2D[0].y)
+        );
+        updatedHistory.emplace_back(
+            cvRound(points2D[2].x),
+            cvRound(points2D[2].y)
+        );
+    }
     
-    measuredHistory.emplace_back(
-        cvRound(points2D[0].x),
-        cvRound(points2D[0].y)
-    );
     predictedHistory.emplace_back(
-        cvRound(points2D[1].x)
-,
+        cvRound(points2D[1].x),
         cvRound(points2D[1].y)
-    );
-    updatedHistory.emplace_back(
-        cvRound(points2D[2].x),
-        cvRound(points2D[2].y)
     );
 
     while (measuredHistory.size() > 30)
     {
         measuredHistory.erase(measuredHistory.begin());
-        predictedHistory.erase(predictedHistory.begin());
         updatedHistory.erase(updatedHistory.begin());
+    }
+
+    while (predictedHistory.size() > 120)
+    {
+        predictedHistory.erase(predictedHistory.begin());
     }
 
     for (int i = 1; i < static_cast<int>(measuredHistory.size()); i++)
@@ -69,13 +76,6 @@ void draw_trajectory(
         );
         cv::line(
             frame,
-            predictedHistory[i - 1],
-            predictedHistory[i],
-            cv::Scalar(0, 255, 0),
-            3
-        ); 
-        cv::line(
-            frame,
             updatedHistory[i - 1],
             updatedHistory[i],
             cv::Scalar(0, 0, 255),
@@ -83,25 +83,42 @@ void draw_trajectory(
         );
     }
     
-    cv::circle(
+    for (int i = 1; i < static_cast<int>(predictedHistory.size()); i++)
+    {
+        cv::line(
             frame,
-            measuredHistory.back(),
-            3,
-            cv::Scalar(255, 0, 0),
-            -1
-        );
-    cv::circle(
+            predictedHistory[i - 1],
+            predictedHistory[i],
+            cv::Scalar(0, 255, 0),
+            3
+        ); 
+    }
+    if (!predictedHistory.empty())
+    {
+        cv::circle(
             frame,
             predictedHistory.back(),
             3,
             cv::Scalar(0, 255, 0),
             -1
         );
-    cv::circle(
+    }
+    if (hasMeasurement && !measuredHistory.empty())
+    {
+        cv::circle(
+            frame,
+            measuredHistory.back(),
+            3,
+            cv::Scalar(255, 0, 0),
+            -1
+        );
+    
+        cv::circle(
             frame,
             updatedHistory.back(),
             3,
             cv::Scalar(0, 0, 255),
             -1
         );
+    }
 }

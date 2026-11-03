@@ -110,19 +110,20 @@ int main()
                 if (hasMeasurement)
                 {
                     kalman->update(tvec);
-                    cv::Vec3d updated = kalman->getPosition();
-                    draw_trajectory(
-                        frame,
-                        tvec, 
-                        predicted, 
-                        updated, 
-                        cameraMatrix, 
-                        distCoeffs, 
-                        measuredHistory, 
-                        predictedHistory, 
-                        updatedHistory
-                    );
                 }
+                cv::Vec3d updated = kalman->getPosition();
+                draw_trajectory(
+                    frame,
+                    tvec, 
+                    predicted, 
+                    updated, 
+                    cameraMatrix, 
+                    distCoeffs, 
+                    measuredHistory, 
+                    predictedHistory, 
+                    updatedHistory,
+                    hasMeasurement
+                );
             }
             cv::putText(
                 frame, 
